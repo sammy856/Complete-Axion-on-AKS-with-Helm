@@ -86,8 +86,8 @@ stages:
               command: build
               containerRegistry: $(acrServiceConnection)
               repository: axion-ui
-              Dockerfile: $(Pipeline.Workspace)/Axion App/axion-ui/Dockerfile
-              buildContext: $(Pipeline.Workspace)/Axion App/axion-ui
+              Dockerfile: $(Pipeline.Workspace)/app/Axion App/axion-ui/Dockerfile
+              buildContext: $(Pipeline.Workspace)app/Axion App/axion-ui
               tags: |
                 $(Build.BuildId)
                 ${{ parameters.environment }}-$(Build.BuildId)
@@ -100,8 +100,8 @@ stages:
               command: build
               containerRegistry: $(acrServiceConnection)
               repository: axion-ingestion-service
-              Dockerfile: $(Pipeline.Workspace)/Axion App/axion-ingestion-service/Dockerfile
-              buildContext: $(Pipeline.Workspace)/Axion App/axion-ingestion-service
+              Dockerfile: $(Pipeline.Workspace)/app/Axion App/axion-ingestion-service/Dockerfile
+              buildContext: $(Pipeline.Workspace)/app/Axion App/axion-ingestion-service
               tags: |
                 $(Build.BuildId)
                 ${{ parameters.environment }}-$(Build.BuildId)
@@ -114,8 +114,8 @@ stages:
               command: build
               containerRegistry: $(acrServiceConnection)
               repository: axion-telemetry-query-service
-              Dockerfile: $(Pipeline.Workspace)/Axion App/axion-telemetry-query-service/Dockerfile
-              buildContext: $(Pipeline.Workspace)/Axion App/axion-telemetry-query-service
+              Dockerfile: $(Pipeline.Workspace)/app/Axion App/axion-telemetry-query-service/Dockerfile
+              buildContext: $(Pipeline.Workspace)/app/Axion App/axion-telemetry-query-service
               tags: |
                 $(Build.BuildId)
                 ${{ parameters.environment }}-$(Build.BuildId)
@@ -128,8 +128,8 @@ stages:
               command: build
               containerRegistry: $(acrServiceConnection)
               repository: axion-data-simulator
-              Dockerfile: $(Pipeline.Workspace)/Axion App/axion-data-simulator/Dockerfile
-              buildContext: $(Pipeline.Workspace)/Axion App/axion-data-simulator
+              Dockerfile: $(Pipeline.Workspace)/app/Axion App/axion-data-simulator/Dockerfile
+              buildContext: $(Pipeline.Workspace)/app/Axion App/axion-data-simulator
               tags: |
                 $(Build.BuildId)
                 ${{ parameters.environment }}-$(Build.BuildId)
