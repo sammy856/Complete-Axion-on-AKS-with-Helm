@@ -87,7 +87,7 @@ stages:
               containerRegistry: $(acrServiceConnection)
               repository: axion-ui
               Dockerfile: $(Pipeline.Workspace)/app/Axion App/axion-ui/Dockerfile
-              buildContext: $(Pipeline.Workspace)app/Axion App/axion-ui
+              buildContext: $(Pipeline.Workspace)/app/Axion App/axion-ui
               tags: |
                 $(Build.BuildId)
                 ${{ parameters.environment }}-$(Build.BuildId)
