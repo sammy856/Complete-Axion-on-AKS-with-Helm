@@ -74,6 +74,22 @@ stages:
               python3 -m pip install --user pyyaml
             displayName: Install Python YAML dependency
 
+          
+          - task: Bash@3
+            displayName: 'Test PyPI Connectivity'
+            inputs:
+              targetType: inline
+              script: |
+                echo "===== DNS TEST ====="
+                getent hosts pypi.org
+
+                echo "===== CURL TEST ====="
+                curl -Iv --connect-timeout 20 --max-time 40 https://pypi.org/simple/fastapi/
+
+                echo "===== PYTHON PIP TEST ====="
+                python -m pip install --no-cache-dir --timeout 60 fastapi==0.115.0
+  
+
           # =================================================
           # STEP 1: DOCKER BUILD
           # =================================================
