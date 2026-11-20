@@ -86,8 +86,8 @@ stages:
               command: build
               containerRegistry: $(acrServiceConnection)
               repository: axion-ui
-              Dockerfile: $(Pipeline.Workspace)/app/Axion App/axion-ui/Dockerfile
-              buildContext: $(Pipeline.Workspace)/app/Axion App/axion-ui
+              Dockerfile: $(Pipeline.Workspace)/Axion App/axion-ui/Dockerfile
+              buildContext: $(Pipeline.Workspace)/Axion App/axion-ui
               tags: |
                 $(Build.BuildId)
                 ${{ parameters.environment }}-$(Build.BuildId)
@@ -100,8 +100,8 @@ stages:
               command: build
               containerRegistry: $(acrServiceConnection)
               repository: axion-ingestion-service
-              Dockerfile: $(Pipeline.Workspace)/app/Axion App/axion-ingestion-service/Dockerfile
-              buildContext: $(Pipeline.Workspace)/app/Axion App/axion-ingestion-service
+              Dockerfile: $(Pipeline.Workspace)/Axion App/axion-ingestion-service/Dockerfile
+              buildContext: $(Pipeline.Workspace)/Axion App/axion-ingestion-service
               tags: |
                 $(Build.BuildId)
                 ${{ parameters.environment }}-$(Build.BuildId)
@@ -114,8 +114,8 @@ stages:
               command: build
               containerRegistry: $(acrServiceConnection)
               repository: axion-telemetry-query-service
-              Dockerfile: $(Pipeline.Workspace)/app/Axion App/axion-telemetry-query-service/Dockerfile
-              buildContext: $(Pipeline.Workspace)/app/Axion App/axion-telemetry-query-service
+              Dockerfile: $(Pipeline.Workspace)/Axion App/axion-telemetry-query-service/Dockerfile
+              buildContext: $(Pipeline.Workspace)/Axion App/axion-telemetry-query-service
               tags: |
                 $(Build.BuildId)
                 ${{ parameters.environment }}-$(Build.BuildId)
@@ -128,8 +128,8 @@ stages:
               command: build
               containerRegistry: $(acrServiceConnection)
               repository: axion-data-simulator
-              Dockerfile: $(Pipeline.Workspace)/app/Axion App/axion-data-simulator/Dockerfile
-              buildContext: $(Pipeline.Workspace)/app/Axion App/axion-data-simulator
+              Dockerfile: $(Pipeline.Workspace)/Axion App/axion-data-simulator/Dockerfile
+              buildContext: $(Pipeline.Workspace)/Axion App/axion-data-simulator
               tags: |
                 $(Build.BuildId)
                 ${{ parameters.environment }}-$(Build.BuildId)
@@ -253,7 +253,7 @@ stages:
 
   - stage: deploytodev
     displayName: Deploy to Dev
-    dependsOn: Build
+    dependsOn: BuildAndPush
     condition: succeeded()
     jobs:
     - deployment: DeployJob
@@ -281,11 +281,11 @@ stages:
                 chartPath: '$(System.DefaultWorkingDirectory)/$(helmChartPath)'
                 releaseName: 'axionui-dev-release'
                 overrideValues: 'image.tag=$(Build.BuildId)'
-                arguments: '--install --create-namespace -f $(System.DefaultWorkingDirectory)/$(helmChartPath)/values.dev.yaml'
+                arguments: '--install --create-namespace -f $(System.DefaultWorkingDirectory)/$(helmChartPath)/values-dev.yaml'
 
   - stage: DeployToQA
     displayName: Deploy to QA
-    dependsOn: DeployToDev
+    dependsOn: deploytodev
     condition: succeeded()
     jobs:
     - deployment: DeployQAJob
@@ -313,7 +313,7 @@ stages:
                 chartPath: '$(System.DefaultWorkingDirectory)/$(helmChartPath)'
                 releaseName: 'axion-qa-release'
                 overrideValues: 'image.tag=$(Build.BuildId)'
-                arguments: '--install --create-namespace -f $(System.DefaultWorkingDirectory)/$(helmChartPath)/values.qa.yaml'
+                arguments: '--install --create-namespace -f $(System.DefaultWorkingDirectory)/$(helmChartPath)/values-qa.yaml'
 
 
 
