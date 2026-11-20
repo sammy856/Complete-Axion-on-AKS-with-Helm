@@ -246,7 +246,7 @@ global:
   imagePullPolicy: IfNotPresent
   azure:
     enabled: true
-    workloadIdentityClientId: "464ac980-6fe4-4683-b10c-8db43119ab0b" # $USER_CLIENT_ID
+    workloadIdentityClientId: "464ac980-6fe4-4683-b10c-8db43119ab0b" # $managedidentity_CLIENT_ID
     tenantId: "d6f408de-8aca-4071-9f35-c11c8f36556c"                 # $TENANT_ID
     keyvaultName: "axion-keyvault"                                   # $KEYVAULT_NAME
 
