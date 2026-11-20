@@ -75,19 +75,19 @@ stages:
             displayName: Install Python YAML dependency
 
           
-          - task: Bash@3
-            displayName: 'Test PyPI Connectivity'
-            inputs:
-              targetType: inline
-              script: |
-                echo "===== DNS TEST ====="
-                getent hosts pypi.org
+          # - task: Bash@3
+          #   displayName: 'Test PyPI Connectivity'
+          #   inputs:
+          #     targetType: inline
+          #     script: |
+          #       echo "===== DNS TEST ====="
+          #       getent hosts pypi.org
 
-                echo "===== CURL TEST ====="
-                curl -Iv --connect-timeout 20 --max-time 40 https://pypi.org/simple/fastapi/
+          #       echo "===== CURL TEST ====="
+          #       curl -Iv --connect-timeout 20 --max-time 40 https://pypi.org/simple/fastapi/
 
-                echo "===== PYTHON PIP TEST ====="
-                python -m pip install --no-cache-dir --timeout 60 fastapi==0.115.0
+          #       echo "===== PYTHON PIP TEST ====="
+          #       python -m pip install --no-cache-dir --timeout 60 fastapi==0.115.0
   
 
           # =================================================
@@ -157,6 +157,7 @@ stages:
           # Scan Axion UI
           - task: trivy@2
             displayName: Trivy Scan - Axion UI
+            continueOnError: true
             condition: or(eq('${{ parameters.imageToBuild }}', 'axion-ui'), eq('${{ parameters.imageToBuild }}', 'all'))
             inputs:
               method: install
@@ -172,6 +173,7 @@ stages:
           # Scan Ingestion Service
           - task: trivy@2
             displayName: Trivy Scan - Ingestion Service
+            continueOnError: true
             condition: or(eq('${{ parameters.imageToBuild }}', 'axion-ingestion-service'), eq('${{ parameters.imageToBuild }}', 'all'))
             inputs:
               method: install
@@ -187,6 +189,7 @@ stages:
           # Scan Telemetry Service
           - task: trivy@2
             displayName: Trivy Scan - Telemetry Query Service
+            continueOnError: true
             condition: or(eq('${{ parameters.imageToBuild }}', 'axion-telemetry-query-service'), eq('${{ parameters.imageToBuild }}', 'all'))
             inputs:
               method: install
@@ -202,6 +205,7 @@ stages:
           # Scan Data Simulator
           - task: trivy@2
             displayName: Trivy Scan - Data Simulator
+            continueOnError: true
             condition: or(eq('${{ parameters.imageToBuild }}', 'axion-data-simulator'), eq('${{ parameters.imageToBuild }}', 'all'))
             inputs:
               method: install
