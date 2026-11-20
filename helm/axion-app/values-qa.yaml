@@ -1,0 +1,43 @@
+# ==============================================================================
+# Axion Platform - QA Environment Configuration
+# ==============================================================================
+
+global:
+  environment: "qa"
+  imagePullPolicy: Always
+  azure:
+    enabled: true
+    keyvaultName: "axion-keyvault"
+
+postgres:
+  host: "mypostgresserver.postgres.database.azure.com"
+  database: "postgresdb"
+
+ui:
+  replicaCount: 2
+  ingress:
+    enabled: true
+    host: "qa.axion.b18g151.online"
+
+telemetry:
+  replicaCount: 2
+  ingress:
+    enabled: true
+    host: "qa-telemetry.b18g151.online"
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 2
+
+ingestion:
+  replicaCount: 2
+
+simulator:
+  enabled: true
+  replicaCount: 2
+  env:
+    intervalSeconds: "5"
+
+database:
+  inCluster:
+    enabled: false

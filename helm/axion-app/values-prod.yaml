@@ -16,7 +16,7 @@ postgres:
 ui:
   replicaCount: 2
   image:
-    repository: "sammycr.azurecr.io/axion-ui"
+    repository: "sammyacr.azurecr.io/axion-ui"
     tag: "v1.0.0"
   ingress:
     enabled: true
@@ -32,7 +32,7 @@ ui:
 telemetry:
   replicaCount: 3
   image:
-    repository: "sammycr.azurecr.io/axion-telemetry-query-service"
+    repository: "sammyacr.azurecr.io/axion-telemetry-query-service"
     tag: "v1.0.0"
   ingress:
     enabled: true
@@ -54,7 +54,7 @@ telemetry:
 ingestion:
   replicaCount: 2
   image:
-    repository: "sammycr.azurecr.io/axion-ingestion-service"
+    repository: "sammyacr.azurecr.io/axion-ingestion-service"
     tag: "v1.0.0"
   resources:
     requests:

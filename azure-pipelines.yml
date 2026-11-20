@@ -302,7 +302,15 @@ stages:
                 chartType: 'FilePath'
                 chartPath: '$(System.DefaultWorkingDirectory)/$(helmChartPath)'
                 releaseName: 'axionui-dev-release'
-                overrideValues: 'image.tag=$(Build.BuildId)'
+                overrideValues: |
+                  ui.image.repository=$(acrLoginServer)/axion-ui
+                  ui.image.tag=$(Build.BuildId)
+                  telemetry.image.repository=$(acrLoginServer)/axion-telemetry-query-service
+                  telemetry.image.tag=$(Build.BuildId)
+                  ingestion.image.repository=$(acrLoginServer)/axion-ingestion-service
+                  ingestion.image.tag=$(Build.BuildId)
+                  simulator.image.repository=$(acrLoginServer)/axion-data-simulator
+                  simulator.image.tag=$(Build.BuildId)
                 arguments: '--install --create-namespace -f $(System.DefaultWorkingDirectory)/$(helmChartPath)/values-dev.yaml'
 
   - stage: DeployToQA
@@ -334,7 +342,15 @@ stages:
                 chartType: 'FilePath'
                 chartPath: '$(System.DefaultWorkingDirectory)/$(helmChartPath)'
                 releaseName: 'axion-qa-release'
-                overrideValues: 'image.tag=$(Build.BuildId)'
+                overrideValues: |
+                  ui.image.repository=$(acrLoginServer)/axion-ui
+                  ui.image.tag=$(Build.BuildId)
+                  telemetry.image.repository=$(acrLoginServer)/axion-telemetry-query-service
+                  telemetry.image.tag=$(Build.BuildId)
+                  ingestion.image.repository=$(acrLoginServer)/axion-ingestion-service
+                  ingestion.image.tag=$(Build.BuildId)
+                  simulator.image.repository=$(acrLoginServer)/axion-data-simulator
+                  simulator.image.tag=$(Build.BuildId)
                 arguments: '--install --create-namespace -f $(System.DefaultWorkingDirectory)/$(helmChartPath)/values-qa.yaml'
 
 
