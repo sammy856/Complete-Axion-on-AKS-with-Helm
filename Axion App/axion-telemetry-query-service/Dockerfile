@@ -11,8 +11,6 @@ RUN apt-get update && \
 # Copy requirements
 COPY requirements.txt .
 
-# Test PyPI connectivity
-RUN python -c "import urllib.request; print(urllib.request.urlopen('https://pypi.org/simple/fastapi/', timeout=30).status)"
 
 # Install dependencies
 RUN python -m pip install \
