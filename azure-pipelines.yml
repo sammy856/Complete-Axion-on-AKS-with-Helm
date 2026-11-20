@@ -32,6 +32,9 @@ variables:
         value: sc-acr-dev
       - name: acrLoginServer
         value: sammyacr.azurecr.io
+      - name: helmChartPath
+        value: helm/axion-app
+
 
   - ${{ if eq(parameters.environment, 'uat') }}:
       - name: acrServiceConnection
@@ -248,69 +251,69 @@ stages:
                 ${{ parameters.environment }}-$(Build.BuildId)
 
 
-- stage: deploytodev
-  displayName: Deploy to Dev
-  dependsOn: Build
-  condition: succeeded()
-  jobs:
-  - deployment: DeployJob
-    displayName: Deploy with Helm to AKS to dev
-    environment: 'Dev-aks'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - checkout: self
-            persistCredentials: true
-          - task: HelmInstaller@1
-            displayName: Install Helm on Agent
-            inputs:
-              helmVersionToInstall: '3.11.0'
+  - stage: deploytodev
+    displayName: Deploy to Dev
+    dependsOn: BuildAndPush
+    condition: succeeded()
+    jobs:
+    - deployment: DeployJob
+      displayName: Deploy with Helm to AKS to dev
+      environment: 'Dev-aks'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - checkout: self
+              persistCredentials: true
+            - task: HelmInstaller@1
+              displayName: Install Helm on Agent
+              inputs:
+                helmVersionToInstall: '3.11.0'
 
-          - task: HelmDeploy@0
-            displayName: Helm Upgrade/Install (Dev)
-            inputs:
-              connectionType: 'Kubernetes Service Connection'
-              kubernetesServiceConnection: 'aksserviceconnection'
-              namespace: 'dev'
-              command: 'upgrade'
-              chartType: 'FilePath'
-              chartPath: '$(System.DefaultWorkingDirectory)/$(helmChartPath)'
-              releaseName: 'axionui-dev-release'
-              overrideValues: 'image.tag=$(Build.BuildId)'
-              arguments: '--install --create-namespace -f $(System.DefaultWorkingDirectory)/$(helmChartPath)/values.dev.yaml'
+            - task: HelmDeploy@0
+              displayName: Helm Upgrade/Install (Dev)
+              inputs:
+                connectionType: 'Kubernetes Service Connection'
+                kubernetesServiceConnection: 'aksserviceconnection'
+                namespace: 'dev'
+                command: 'upgrade'
+                chartType: 'FilePath'
+                chartPath: '$(System.DefaultWorkingDirectory)/$(helmChartPath)'
+                releaseName: 'axionui-dev-release'
+                overrideValues: 'image.tag=$(Build.BuildId)'
+                arguments: '--install --create-namespace -f $(System.DefaultWorkingDirectory)/$(helmChartPath)/values-dev.yaml'
 
-- stage: DeployToQA
-  displayName: Deploy to QA
-  dependsOn: DeployToDev
-  condition: succeeded()
-  jobs:
-  - deployment: DeployQAJob
-    displayName: Deploy with Helm to AKS
-    environment: 'QA-aks'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - checkout: self
-            persistCredentials: true
-          - task: HelmInstaller@1
-            displayName: Install Helm on Agent
-            inputs:
-              helmVersionToInstall: '3.11.0'
+  - stage: DeployToQA
+    displayName: Deploy to QA
+    dependsOn: deploytodev
+    condition: succeeded()
+    jobs:
+    - deployment: DeployQAJob
+      displayName: Deploy with Helm to AKS
+      environment: 'QA-aks'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - checkout: self
+              persistCredentials: true
+            - task: HelmInstaller@1
+              displayName: Install Helm on Agent
+              inputs:
+                helmVersionToInstall: '3.11.0'
 
-          - task: HelmDeploy@0
-            displayName: Helm Upgrade/Install (QA)
-            inputs:
-              connectionType: 'Kubernetes Service Connection'
-              kubernetesServiceConnection: 'aksserviceconnection'
-              namespace: 'qa'
-              command: 'upgrade'
-              chartType: 'FilePath'
-              chartPath: '$(System.DefaultWorkingDirectory)/$(helmChartPath)'
-              releaseName: 'axion-qa-release'
-              overrideValues: 'image.tag=$(Build.BuildId)'
-              arguments: '--install --create-namespace -f $(System.DefaultWorkingDirectory)/$(helmChartPath)/values.qa.yaml'
+            - task: HelmDeploy@0
+              displayName: Helm Upgrade/Install (QA)
+              inputs:
+                connectionType: 'Kubernetes Service Connection'
+                kubernetesServiceConnection: 'aksserviceconnection'
+                namespace: 'qa'
+                command: 'upgrade'
+                chartType: 'FilePath'
+                chartPath: '$(System.DefaultWorkingDirectory)/$(helmChartPath)'
+                releaseName: 'axion-qa-release'
+                overrideValues: 'image.tag=$(Build.BuildId)'
+                arguments: '--install --create-namespace -f $(System.DefaultWorkingDirectory)/$(helmChartPath)/values-qa.yaml'
 
 
 
