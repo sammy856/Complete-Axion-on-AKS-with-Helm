@@ -7,7 +7,7 @@ import { Throughput } from '../Throughput';
 import { DigitalTwin } from '../DigitalTwin';
 import { ThermalCamera } from '../ThermalCamera';
 
-const API_BASE = 'dev-telemetry.b18g151.online';
+const API_BASE = 'http://dev-telemetry.b18g151.online';
 
 interface DashboardViewProps {
   devices: any[];
