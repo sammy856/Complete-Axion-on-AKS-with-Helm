@@ -104,6 +104,7 @@ stages:
               repository: axion-ui
               Dockerfile: $(Pipeline.Workspace)/app/Axion App/axion-ui/Dockerfile
               buildContext: $(Pipeline.Workspace)/app/Axion App/axion-ui
+              arguments: '--network=host'
               tags: |
                 $(Build.BuildId)
                 ${{ parameters.environment }}-$(Build.BuildId)
@@ -118,6 +119,7 @@ stages:
               repository: axion-ingestion-service
               Dockerfile: $(Pipeline.Workspace)/app/Axion App/axion-ingestion-service/Dockerfile
               buildContext: $(Pipeline.Workspace)/app/Axion App/axion-ingestion-service
+              arguments: '--network=host'
               tags: |
                 $(Build.BuildId)
                 ${{ parameters.environment }}-$(Build.BuildId)
@@ -132,6 +134,7 @@ stages:
               repository: axion-telemetry-query-service
               Dockerfile: $(Pipeline.Workspace)/app/Axion App/axion-telemetry-query-service/Dockerfile
               buildContext: $(Pipeline.Workspace)/app/Axion App/axion-telemetry-query-service
+              arguments: '--network=host'
               tags: |
                 $(Build.BuildId)
                 ${{ parameters.environment }}-$(Build.BuildId)
@@ -146,6 +149,7 @@ stages:
               repository: axion-data-simulator
               Dockerfile: $(Pipeline.Workspace)/app/Axion App/axion-data-simulator/Dockerfile
               buildContext: $(Pipeline.Workspace)/app/Axion App/axion-data-simulator
+              arguments: '--network=host'
               tags: |
                 $(Build.BuildId)
                 ${{ parameters.environment }}-$(Build.BuildId)
