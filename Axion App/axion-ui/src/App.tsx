@@ -15,7 +15,7 @@ import { SystemSettings } from './components/pages/SystemSettings';
 import { DashboardView } from './components/pages/DashboardView';
 import { NotFound } from './components/pages/NotFound';
 
-const API_BASE = 'http://telemetry.b18g151.online';
+const API_BASE = 'http://dev-telemetry.b18g151.online';
 
 function App() {
   const location = useLocation();

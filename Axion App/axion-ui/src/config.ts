@@ -19,7 +19,7 @@ const getApiBase = (): string => {
       }
     }
   }
-  return 'http://telemetry.b18g151.online';
+  return 'http://dev-telemetry.b18g151.online';
 };
 
 export const API_BASE = getApiBase();
