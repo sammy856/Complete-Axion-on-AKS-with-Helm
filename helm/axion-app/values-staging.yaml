@@ -1,0 +1,53 @@
+# ==============================================================================
+# Axion Platform - STAGING Environment Configuration
+# ==============================================================================
+
+global:
+  environment: "staging"
+  imagePullPolicy: IfNotPresent
+  azure:
+    enabled: true
+    keyvaultName: "axion-kv-staging"
+
+postgres:
+  host: "staging-postgres.postgres.database.azure.com"
+  database: "postgresdb_staging"
+
+ui:
+  replicaCount: 2
+  image:
+    tag: "staging-rc1"
+  ingress:
+    enabled: true
+    host: "staging.axion.b18g151.online"
+
+telemetry:
+  replicaCount: 2
+  image:
+    tag: "staging-rc1"
+  ingress:
+    enabled: true
+    host: "staging-telemetry.b18g151.online"
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 4
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 70
+
+ingestion:
+  replicaCount: 2
+  image:
+    tag: "staging-rc1"
+
+simulator:
+  enabled: true # Can be used for staging integration / stress testing
+  replicaCount: 1
+  image:
+    tag: "staging-rc1"
+  env:
+    intervalSeconds: "3"
+
+database:
+  inCluster:
+    enabled: false

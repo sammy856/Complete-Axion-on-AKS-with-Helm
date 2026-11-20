@@ -1,0 +1,18 @@
+{{- if .Values.ingestion.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "axion.fullname" . }}-ingestion
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "axion.ingestion.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.ingestion.service.type }}
+  ports:
+    - port: {{ .Values.ingestion.service.port }}
+      targetPort: {{ .Values.ingestion.service.targetPort }}
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "axion.ingestion.selectorLabels" . | nindent 4 }}
+{{- end }}

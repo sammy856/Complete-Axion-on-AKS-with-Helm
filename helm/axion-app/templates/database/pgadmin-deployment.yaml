@@ -1,0 +1,30 @@
+{{- if and .Values.database.inCluster.enabled .Values.database.inCluster.pgadmin.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "axion.fullname" . }}-pgadmin
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "axion.pgadmin.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "axion.pgadmin.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "axion.pgadmin.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: pgadmin
+          image: {{ .Values.database.inCluster.pgadmin.image | quote }}
+          ports:
+            - containerPort: {{ .Values.database.inCluster.pgadmin.port }}
+              name: http
+          env:
+            - name: PGADMIN_DEFAULT_EMAIL
+              value: {{ .Values.database.inCluster.pgadmin.email | quote }}
+            - name: PGADMIN_DEFAULT_PASSWORD
+              value: {{ .Values.database.inCluster.pgadmin.password | quote }}
+{{- end }}

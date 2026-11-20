@@ -1,0 +1,32 @@
+{{- if .Values.simulator.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "axion.fullname" . }}-simulator
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "axion.simulator.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.simulator.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "axion.simulator.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "axion.simulator.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: axion-simulator
+          image: "{{ .Values.simulator.image.repository }}:{{ .Values.simulator.image.tag }}"
+          imagePullPolicy: {{ .Values.simulator.image.pullPolicy | default .Values.global.imagePullPolicy }}
+          env:
+            - name: API_URL
+              value: {{ .Values.simulator.env.apiUrl | default (printf "http://%s-ingestion:%v/api/v1/telemetry/ingest" (include "axion.fullname" .) .Values.ingestion.service.port) | quote }}
+            - name: INTERVAL_SECONDS
+              value: {{ .Values.simulator.env.intervalSeconds | default "5" | quote }}
+          {{- with .Values.simulator.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+{{- end }}

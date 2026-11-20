@@ -1,0 +1,51 @@
+# ==============================================================================
+# Axion Platform - DEV Environment Configuration
+# ==============================================================================
+
+global:
+  environment: "dev"
+  imagePullPolicy: Always
+  azure:
+    enabled: true
+    keyvaultName: "axion-kv-develop"
+
+postgres:
+  host: "myserver-postgres.postgres.database.azure.com"
+  database: "postgresdb"
+
+ui:
+  replicaCount: 1
+  image:
+    tag: "dev-18"
+  ingress:
+    enabled: true
+    host: "dev.axion.b18g151.online"
+
+telemetry:
+  replicaCount: 1
+  image:
+    tag: "dev-18"
+  ingress:
+    enabled: true
+    host: "dev-telemetry.b18g151.online"
+  autoscaling:
+    enabled: false # Dev does not need heavy HPA
+    minReplicas: 1
+    maxReplicas: 2
+
+ingestion:
+  replicaCount: 1
+  image:
+    tag: "dev-18"
+
+simulator:
+  enabled: true # Keep simulator active in dev for test data generation
+  replicaCount: 1
+  image:
+    tag: "dev-18"
+  env:
+    intervalSeconds: "5"
+
+database:
+  inCluster:
+    enabled: false

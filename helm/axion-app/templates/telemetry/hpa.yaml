@@ -1,0 +1,33 @@
+{{- if and .Values.telemetry.enabled .Values.telemetry.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "axion.fullname" . }}-telemetry-hpa
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "axion.telemetry.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "axion.fullname" . }}-telemetry
+  minReplicas: {{ .Values.telemetry.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.telemetry.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.telemetry.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.telemetry.autoscaling.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.telemetry.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.telemetry.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}
+{{- end }}

@@ -1,0 +1,42 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: axion-environments
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+          - env: dev
+            namespace: dev
+            valueFile: values-dev.yaml
+          - env: staging
+            namespace: staging
+            valueFile: values-staging.yaml
+          - env: prod
+            namespace: prod
+            valueFile: values-prod.yaml
+  template:
+    metadata:
+      name: 'axion-{{env}}'
+      labels:
+        environment: '{{env}}'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/<YOUR_GITHUB_ORG_OR_USERNAME>/axion-gitops.git
+        targetRevision: HEAD
+        path: helm/axion-app
+        helm:
+          valueFiles:
+            - values.yaml
+            - '{{valueFile}}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{namespace}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

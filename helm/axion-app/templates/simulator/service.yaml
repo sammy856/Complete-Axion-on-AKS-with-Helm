@@ -1,0 +1,18 @@
+{{- if .Values.simulator.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "axion.fullname" . }}-simulator
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "axion.simulator.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.simulator.service.type }}
+  ports:
+    - port: {{ .Values.simulator.service.port }}
+      targetPort: {{ .Values.simulator.service.targetPort }}
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "axion.simulator.selectorLabels" . | nindent 4 }}
+{{- end }}

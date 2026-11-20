@@ -1,0 +1,36 @@
+{{- if and .Values.database.inCluster.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "axion.fullname" . }}-postgres
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "axion.postgres.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "axion.postgres.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "axion.postgres.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: postgresql
+          image: {{ .Values.database.inCluster.postgres.image | quote }}
+          ports:
+            - containerPort: {{ .Values.database.inCluster.postgres.port }}
+              name: postgresql
+          env:
+            - name: POSTGRES_USER
+              value: {{ .Values.database.inCluster.postgres.user | quote }}
+            - name: POSTGRES_PASSWORD
+              value: {{ .Values.database.inCluster.postgres.password | quote }}
+            - name: POSTGRES_DB
+              value: {{ .Values.database.inCluster.postgres.database | quote }}
+          {{- with .Values.database.inCluster.postgres.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+{{- end }}

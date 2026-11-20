@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: axion-ingestion-pod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: axion-ingestion-pod
+  template:
+    metadata:
+      labels:
+        app: axion-ingestion-pod
+        azure.workload.identity/use: 'true'
+    spec:
+      serviceAccountName: axion-keyvault-sa
+      containers:
+      - name: axion-ingestion-pod
+        image: sammycr.azurecr.io/axion-ingestion-service:dev-18
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: axion-postgres-secret
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: axion-postgres-secret
+              key: POSTGRES_PASSWORD
+        - name: POSTGRES_HOST
+          value: myserver-postgres.postgres.database.azure.com
+        - name: POSTGRES_PORT
+          value: '5432'
+        - name: POSTGRES_DB
+          value: postgresdb
+        volumeMounts:
+        - name: secrets-store
+          mountPath: /mnt/secrets-store
+          readOnly: true
+      volumes:
+      - name: secrets-store
+        csi:
+          driver: secrets-store.csi.k8s.io
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: axion-keyvault-secrets

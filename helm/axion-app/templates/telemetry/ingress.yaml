@@ -1,0 +1,28 @@
+{{- if and .Values.telemetry.enabled .Values.telemetry.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "axion.fullname" . }}-telemetry-ingress
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "axion.telemetry.labels" . | nindent 4 }}
+  {{- with .Values.telemetry.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.telemetry.ingress.className }}
+  ingressClassName: {{ .Values.telemetry.ingress.className }}
+  {{- end }}
+  rules:
+    - host: {{ .Values.telemetry.ingress.host | quote }}
+      http:
+        paths:
+          - path: {{ .Values.telemetry.ingress.path | default "/" }}
+            pathType: {{ .Values.telemetry.ingress.pathType | default "Prefix" }}
+            backend:
+              service:
+                name: {{ include "axion.fullname" . }}-telemetry
+                port:
+                  number: {{ .Values.telemetry.service.port }}
+{{- end }}

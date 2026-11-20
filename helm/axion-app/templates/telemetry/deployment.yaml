@@ -1,0 +1,77 @@
+{{- if .Values.telemetry.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "axion.fullname" . }}-telemetry
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "axion.telemetry.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.telemetry.autoscaling.enabled }}
+  replicas: {{ .Values.telemetry.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "axion.telemetry.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "axion.telemetry.selectorLabels" . | nindent 8 }}
+        {{- if .Values.keyvault.enabled }}
+        azure.workload.identity/use: "true"
+        {{- end }}
+      annotations:
+        {{- if .Values.keyvault.enabled }}
+        azure.workload.identity/use: "true"
+        {{- end }}
+    spec:
+      {{- if .Values.keyvault.enabled }}
+      serviceAccountName: {{ include "axion.serviceAccountName" . }}
+      {{- end }}
+      containers:
+        - name: axion-telemetry
+          image: "{{ .Values.telemetry.image.repository }}:{{ .Values.telemetry.image.tag }}"
+          imagePullPolicy: {{ .Values.telemetry.image.pullPolicy | default .Values.global.imagePullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.telemetry.containerPort }}
+              protocol: TCP
+          env:
+            - name: POSTGRES_HOST
+              value: {{ .Values.postgres.host | quote }}
+            - name: POSTGRES_PORT
+              value: {{ .Values.postgres.port | quote }}
+            - name: POSTGRES_DB
+              value: {{ .Values.postgres.database | quote }}
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.postgres.existingSecret }}
+                  key: {{ .Values.postgres.userSecretKey }}
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.postgres.existingSecret }}
+                  key: {{ .Values.postgres.passwordSecretKey }}
+            - name: PORT
+              value: {{ .Values.telemetry.env.PORT | default "8000" | quote }}
+          {{- with .Values.telemetry.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.keyvault.enabled }}
+          volumeMounts:
+            - name: secrets-store
+              mountPath: /mnt/secrets-store
+              readOnly: true
+          {{- end }}
+      {{- if .Values.keyvault.enabled }}
+      volumes:
+        - name: secrets-store
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: {{ .Values.keyvault.secretProviderClass.name }}
+      {{- end }}
+{{- end }}

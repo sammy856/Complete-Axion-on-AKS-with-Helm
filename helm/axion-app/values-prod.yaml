@@ -1,0 +1,73 @@
+# ==============================================================================
+# Axion Platform - PRODUCTION Environment Configuration
+# ==============================================================================
+
+global:
+  environment: "prod"
+  imagePullPolicy: IfNotPresent
+  azure:
+    enabled: true
+    keyvaultName: "axion-kv-prod"
+
+postgres:
+  host: "prod-postgres.postgres.database.azure.com"
+  database: "postgresdb_prod"
+
+ui:
+  replicaCount: 2
+  image:
+    repository: "sammycr.azurecr.io/axion-ui"
+    tag: "v1.0.0"
+  ingress:
+    enabled: true
+    host: "axion.b18g151.online"
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 250m
+      memory: 256Mi
+
+telemetry:
+  replicaCount: 3
+  image:
+    repository: "sammycr.azurecr.io/axion-telemetry-query-service"
+    tag: "v1.0.0"
+  ingress:
+    enabled: true
+    host: "telemetry.b18g151.online"
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 70
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+ingestion:
+  replicaCount: 2
+  image:
+    repository: "sammycr.azurecr.io/axion-ingestion-service"
+    tag: "v1.0.0"
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+simulator:
+  enabled: false # In Production, real IoT devices send telemetry; simulator is disabled
+  replicaCount: 0
+
+database:
+  inCluster:
+    enabled: false # Production always uses Azure Database for PostgreSQL Flexible Server

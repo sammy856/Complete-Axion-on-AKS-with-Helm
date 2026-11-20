@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: axion-ui-pod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: axion-ui-pod
+  template:
+    metadata:
+      labels:
+        app: axion-ui-pod
+    spec:
+      containers:
+      - name: axion-ui
+        image: sammycr.azurecr.io/axion-ui:dev-18
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80

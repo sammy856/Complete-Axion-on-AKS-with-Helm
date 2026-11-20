@@ -1,0 +1,211 @@
+# ==============================================================================
+# Axion Platform - Multi-Environment Helm Values (Base / Default)
+# ==============================================================================
+
+# Global settings shared across services
+global:
+  environment: "dev"
+  imagePullPolicy: IfNotPresent
+  azure:
+    enabled: true
+    workloadIdentityClientId: "0dd26c58-8a3e-40ce-a3f0-01eb2d37a02d"
+    tenantId: "3aaeeb8f-a679-4764-879f-f9839833ec2f"
+    keyvaultName: "axion-kv-develop"
+
+nameOverride: ""
+fullnameOverride: ""
+
+# ==============================================================================
+# Azure Key Vault & Secrets Configuration
+# ==============================================================================
+keyvault:
+  enabled: true
+  serviceAccount:
+    create: true
+    name: "axion-keyvault-sa"
+    annotations: {}
+  secretProviderClass:
+    create: true
+    name: "axion-keyvault-secrets"
+    provider: "azure"
+    keyvaultName: "" # If empty, inherits from global.azure.keyvaultName
+    clientID: ""     # If empty, inherits from global.azure.workloadIdentityClientId
+    tenantId: ""     # If empty, inherits from global.azure.tenantId
+    secrets:
+      - objectName: "postgres-username"
+        objectType: "secret"
+        k8sSecretKey: "POSTGRES_USER"
+        targetK8sSecret: "axion-postgres-secret"
+      - objectName: "postgres-password"
+        objectType: "secret"
+        k8sSecretKey: "POSTGRES_PASSWORD"
+        targetK8sSecret: "axion-postgres-secret"
+      - objectName: "pgadmin-username"
+        objectType: "secret"
+        k8sSecretKey: "PGADMIN_DEFAULT_EMAIL"
+        targetK8sSecret: "axion-pgadmin-secret"
+      - objectName: "pgadmin-password"
+        objectType: "secret"
+        k8sSecretKey: "PGADMIN_DEFAULT_PASSWORD"
+        targetK8sSecret: "axion-pgadmin-secret"
+
+# ==============================================================================
+# Database Configuration (Azure PostgreSQL Flexible Server or In-Cluster)
+# ==============================================================================
+postgres:
+  host: "myserver-postgres.postgres.database.azure.com"
+  port: 5432
+  database: "postgresdb"
+  existingSecret: "axion-postgres-secret"
+  userSecretKey: "POSTGRES_USER"
+  passwordSecretKey: "POSTGRES_PASSWORD"
+
+# ==============================================================================
+# 1. Axion UI (Frontend Web Application)
+# ==============================================================================
+ui:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: "sammycr.azurecr.io/axion-ui"
+    tag: "dev-18"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 80
+  ingress:
+    enabled: true
+    className: "azure-application-gateway"
+    host: "axion.b18g151.online"
+    path: /
+    pathType: Prefix
+    annotations:
+      appgw.ingress.kubernetes.io/health-probe-path: "/"
+      appgw.ingress.kubernetes.io/health-probe-port: "80"
+      appgw.ingress.kubernetes.io/health-probe-status-codes: "200-399"
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+
+# ==============================================================================
+# 2. Axion Telemetry Query Service (Backend API)
+# ==============================================================================
+telemetry:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: "sammycr.azurecr.io/axion-telemetry-query-service"
+    tag: "dev-18"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 8000
+  containerPort: 8000
+  env:
+    PORT: "8000"
+  resources:
+    requests:
+      cpu: 40m
+      memory: 40Mi
+    limits:
+      cpu: 100m
+      memory: 100Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 70
+  ingress:
+    enabled: true
+    className: "azure-application-gateway"
+    host: "telemetry.b18g151.online"
+    path: /
+    pathType: Prefix
+    annotations:
+      appgw.ingress.kubernetes.io/health-probe-path: "/health"
+      appgw.ingress.kubernetes.io/health-probe-port: "8000"
+      appgw.ingress.kubernetes.io/health-probe-status-codes: "200-399"
+
+# ==============================================================================
+# 3. Axion Ingestion Service (Backend Ingestion)
+# ==============================================================================
+ingestion:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: "sammycr.azurecr.io/axion-ingestion-service"
+    tag: "dev-18"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 8000
+  containerPort: 8000
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+
+# ==============================================================================
+# 4. Axion Data Simulator (Simulates IoT Sensors & Telemetry)
+# ==============================================================================
+simulator:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: "sammycr.azurecr.io/axion-data-simulator"
+    tag: "dev-18"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 80
+  env:
+    apiUrl: "" # If empty, automatically resolves to internal ingestion service
+    intervalSeconds: "5"
+  resources:
+    requests:
+      cpu: 20m
+      memory: 32Mi
+    limits:
+      cpu: 50m
+      memory: 64Mi
+
+# ==============================================================================
+# 5. In-Cluster PostgreSQL & pgAdmin (Optional / For testing without Azure DB)
+# ==============================================================================
+database:
+  inCluster:
+    enabled: false
+    postgres:
+      image: "postgres:17.10"
+      port: 5432
+      user: "admin"
+      password: "adminpassword"
+      database: "postgresdb"
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          cpu: 250m
+          memory: 256Mi
+    pgadmin:
+      enabled: false
+      image: "dpage/pgadmin4:latest"
+      port: 80
+      email: "sameersingh856@gmail.com"
+      password: "adminpassword"
+      service:
+        type: ClusterIP
+        port: 80
