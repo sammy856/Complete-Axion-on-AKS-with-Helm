@@ -8,9 +8,9 @@ global:
   imagePullPolicy: IfNotPresent
   azure:
     enabled: true
-    workloadIdentityClientId: "0dd26c58-8a3e-40ce-a3f0-01eb2d37a02d"
-    tenantId: "3aaeeb8f-a679-4764-879f-f9839833ec2f"
-    keyvaultName: "axion-kv-develop"
+    workloadIdentityClientId: "464ac980-6fe4-4683-b10c-8db43119ab0b"
+    tenantId: "d6f408de-8aca-4071-9f35-c11c8f36556c"
+    keyvaultName: "axion-keyvault"
 
 nameOverride: ""
 fullnameOverride: ""
@@ -53,7 +53,7 @@ keyvault:
 # Database Configuration (Azure PostgreSQL Flexible Server or In-Cluster)
 # ==============================================================================
 postgres:
-  host: "myserver-postgres.postgres.database.azure.com"
+  host: "mypostgresserver.postgres.database.azure.com"
   port: 5432
   database: "postgresdb"
   existingSecret: "axion-postgres-secret"

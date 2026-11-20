@@ -7,14 +7,14 @@ global:
   imagePullPolicy: Always
   azure:
     enabled: true
-    keyvaultName: "axion-kv-develop"
+    keyvaultName: "axion-keyvault"
 
 postgres:
-  host: "myserver-postgres.postgres.database.azure.com"
+  host: "mypostgresserver.postgres.database.azure.com"
   database: "postgresdb"
 
 ui:
-  replicaCount: 1
+  replicaCount: 2
   image:
     tag: "dev-18"
   ingress:
@@ -22,7 +22,7 @@ ui:
     host: "dev.axion.b18g151.online"
 
 telemetry:
-  replicaCount: 1
+  replicaCount: 2
   image:
     tag: "dev-18"
   ingress:
@@ -34,13 +34,13 @@ telemetry:
     maxReplicas: 2
 
 ingestion:
-  replicaCount: 1
+  replicaCount: 2
   image:
     tag: "dev-18"
 
 simulator:
   enabled: true # Keep simulator active in dev for test data generation
-  replicaCount: 1
+  replicaCount: 2
   image:
     tag: "dev-18"
   env:
