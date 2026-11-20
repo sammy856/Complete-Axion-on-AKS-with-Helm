@@ -2,11 +2,27 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-# Install dependencies first for Docker layer caching
-COPY requirements.txt .
-RUN pip install --no-cache-dir --default-timeout=120 --retries=10 -r requirements.txt
+# Install SSL certificates
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ca-certificates && \
+    update-ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
 
-# Copy application code
+# Copy requirements
+COPY requirements.txt .
+
+# Test PyPI connectivity
+RUN python -c "import urllib.request; print(urllib.request.urlopen('https://pypi.org/simple/fastapi/', timeout=30).status)"
+
+# Install dependencies
+RUN python -m pip install \
+    --no-cache-dir \
+    --index-url https://pypi.org/simple \
+    --timeout=120 \
+    --retries=10 \
+    -r requirements.txt
+
+# Copy application
 COPY . .
 
 EXPOSE 8000
