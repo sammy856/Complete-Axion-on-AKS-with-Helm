@@ -6,7 +6,7 @@ WORKDIR /app
 COPY requirements.txt .
 
 # Install dependencies
-RUN pip install --no-cache-dir --trusted-host pypi.org --trusted-host files.pythonhosted.org -r requirements.txt
+RUN pip install --no-cache-dir --default-timeout=120 --retries=5 --trusted-host pypi.org --trusted-host files.pythonhosted.org --trusted-host pypi.python.org -r requirements.txt
 
 # Copy application
 COPY . .

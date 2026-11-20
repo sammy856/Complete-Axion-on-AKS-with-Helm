@@ -60,6 +60,8 @@ stages:
     jobs:
       - job: DockerBuildPush
         displayName: Build, Scan and Push Selected Images
+        variables:
+          DOCKER_BUILDKIT: '0'
 
         steps:
 
@@ -74,20 +76,16 @@ stages:
               python3 -m pip install --user pyyaml
             displayName: Install Python YAML dependency
 
-          
-          # - task: Bash@3
-          #   displayName: 'Test PyPI Connectivity'
-          #   inputs:
-          #     targetType: inline
-          #     script: |
-          #       echo "===== DNS TEST ====="
-          #       getent hosts pypi.org
-
-          #       echo "===== CURL TEST ====="
-          #       curl -Iv --connect-timeout 20 --max-time 40 https://pypi.org/simple/fastapi/
-
-          #       echo "===== PYTHON PIP TEST ====="
-          #       python -m pip install --no-cache-dir --timeout 60 fastapi==0.115.0
+          # Configure Docker MTU and DNS to prevent packet drop during builds
+          - bash: |
+              echo "Configuring Docker daemon MTU and DNS..."
+              sudo mkdir -p /etc/docker
+              echo '{"mtu": 1400, "dns": ["8.8.8.8", "1.1.1.1"]}' | sudo tee /etc/docker/daemon.json
+              sudo systemctl daemon-reload
+              sudo systemctl restart docker
+              echo "Docker MTU configuration applied:"
+              docker network inspect bridge --format '{{json .Options}}' || true
+            displayName: 'Configure Docker MTU and DNS'
   
 
           # =================================================
